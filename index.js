@@ -4,8 +4,7 @@ const port = process.env.PORT || 5000;
 var cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion } = require("mongodb");
-// q1yUOAk9pGvA1VUU
-// tourism_hub
+// mongo
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.6tngyrc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -27,13 +26,38 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+
+    // mongoDB
+    const database = client.db("spotDB");
+    const spotCollection = database.collection("touristSpot");
+    const userCollection = database.collection("users");
+    // insert Data
+    app.post("/spot", async (req, res) => {
+      const newSpot = req.body;
+      const result = await spotCollection.insertOne(newSpot);
+      res.send(result);
+    });
+
+    // get spots data
+    app.get("/spot", async (req, res) => {
+      const cursor = await spotCollection.find().sort({ cost: 1 }).toArray();
+      res.send(cursor);
+    });
+
+    // user related API
+    app.post("/user", async (req, res) => {
+      const newUser = req.body;
+      const result = await userCollection.insertOne(newUser);
+      res.send(result);
+      console.log(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
-
+// mongo
 app.use(express.json());
 app.use(cors());
 app.get("/", (req, res) => {
