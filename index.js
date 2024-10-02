@@ -51,6 +51,13 @@ async function run() {
       res.send(result);
       console.log(result);
     });
+    // get tourist spot based on email address
+    app.get("/mylist", async (req, res) => {
+      const { email } = req.query;
+      const cursor = await spotCollection.find().toArray();
+      res.send(cursor);
+    });
+    // Get tourist spots based on email address
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
