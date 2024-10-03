@@ -43,6 +43,11 @@ async function run() {
       const cursor = await spotCollection.find().sort({ cost: 1 }).toArray();
       res.send(cursor);
     });
+    // get all spot data
+    app.get("/allspot", async (req, res) => {
+      const cursor = await spotCollection.find().sort({ cost: 1 }).toArray();
+      res.send(cursor);
+    });
 
     // user related API
     app.post("/user", async (req, res) => {
@@ -56,6 +61,47 @@ async function run() {
       const { email } = req.query;
       const cursor = await spotCollection.find().toArray();
       res.send(cursor);
+    });
+    // delete a specific doc on my list
+    app.delete("/mylist/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await spotCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // update a specific spot
+    // step 1 :find the spot
+    app.get("/mylist/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await spotCollection.findOne(query);
+      res.send(result);
+    });
+    // step 2:update the doc
+    app.put("/mylist/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedSpot = req.body;
+      console.log(updatedSpot);
+      const spot = {
+        $set: {
+          image: updatedSpot.image,
+          touristsSpotName: updatedSpot.touristsSpotName,
+          countryName: updatedSpot.countryName,
+          location: updatedSpot.location,
+          description: updatedSpot.description,
+          cost: updatedSpot.cost,
+          season: updatedSpot.season,
+          time: updatedSpot.time,
+          visitors: updatedSpot.visitors,
+          email: updatedSpot.email,
+          user_name: updatedSpot.user_name,
+        },
+      };
+      const result = await spotCollection.updateOne(filter, spot, options);
+      res.send(result);
     });
 
     // get specific data for showing details
