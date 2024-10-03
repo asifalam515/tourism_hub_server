@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 var cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 // mongo
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.6tngyrc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -56,6 +56,14 @@ async function run() {
       const { email } = req.query;
       const cursor = await spotCollection.find().toArray();
       res.send(cursor);
+    });
+
+    // get specific data for showing details
+    app.get("/viewdetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await spotCollection.findOne(query);
+      res.send(result);
     });
     // Get tourist spots based on email address
   } finally {
